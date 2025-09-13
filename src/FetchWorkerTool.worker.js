@@ -57,9 +57,16 @@ const onMessage = ({data: job}) => {
             return Promise.reject(result.status);
         })
         .then(buffer => complete.push({id: job.id, buffer}))
-        .catch(error => complete.push({id: job.id, error: (error && error.message) || `Failed request: ${job.url}`}))
+        .catch(error => {
+            console.error('Fetch error for job', job.id, ':', error);
+            complete.push({id: job.id, error: (error && error.message) || `Failed request: ${job.url}`});
+        })
         .then(() => jobsActive--);
 };
+// Global error handler for unhandled errors
+self.addEventListener('error', event => {
+    console.error('Unhandled error in worker:', event.error);
+});
 
 // crossFetch means "fetch" is now always supported
 postMessage({support: {fetch: true}});

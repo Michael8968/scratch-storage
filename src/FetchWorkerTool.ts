@@ -52,6 +52,10 @@ class PrivateFetchWorkerTool implements Tool {
                 const worker = new Worker(
                     /* webpackChunkName: "fetch-worker" */ new URL('./FetchWorkerTool.worker', import.meta.url)
                 );
+                worker.onerror = e => {
+                    console.error('Worker error:', e);
+                    this._supportError = e;
+                };
 
                 worker.addEventListener('message', ({data}) => {
                     if (data.support) {
